@@ -1,6 +1,30 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Create resources VPC and EC2.
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: aws-agahie-key
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  InstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-7f418316
+    us-west-1:
+      AMI: ami-951945d0
+    us-west-2:
+      AMI: ami-16fd7026
+    eu-west-1:
+      AMI: ami-24506250
 Resources:
   LabVPC:
     Type: AWS::EC2::VPC
@@ -38,7 +62,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
-  SecurityGroup:
+  SSHSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: "Internet Group"
@@ -54,8 +78,15 @@ Resources:
           CidrIp: 0.0.0.0/0
   MyEC2:
     Type: AWS::EC2::Instance
-    InstanceType: t2.micro
-    SubnetId: !Ref PublicSubnet1
-    AvailabilityZone: us-east-2a
-    KeyName: aws-agahie-key
-    
+    Properties:
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - AMI
+      SecurityGroups:
+        - !Ref SSHSecurityGroup        
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName      
+      SubnetId:
+        - !Ref PublicSubnet1
+      AvailabilityZone: us-east-2a
