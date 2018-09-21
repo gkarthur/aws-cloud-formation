@@ -1,45 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  An AWS VPC with three subnets.
-Parameters:
-  KeyName:
-    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
-    Type: 'AWS::EC2::KeyPair::KeyName'
-    ConstraintDescription: must be the name of an existing EC2 KeyPair.
-  InstanceType:
-    Description: WebServer EC2 instance type
-    Type: String
-    Default: t2.micro
-    AllowedValues:
-      - t1.micro
-      - t2.nano
-      - t2.micro
-      - t2.small
-    ConstraintDescription: must be a valid EC2 instance type.
-Mappings:
-  AWSInstanceType2Arch:
-    t1.micro:
-      Arch: PV64
-    t2.nano:
-      Arch: HVM64
-    t2.micro:
-      Arch: HVM64
-  AWSInstanceType2NATArch:
-    t1.micro:
-      Arch: NATPV64
-    t2.nano:
-      Arch: NATHVM64
-    t2.micro:
-      Arch: NATHVM64
-  AWSRegionArch2AMI:
-    us-east-1:
-      PV64: ami-2a69aa47
-      HVM64: ami-97785bed
-      HVMG2: ami-0a6e3770
-    us-west-2:
-      PV64: ami-7f77b31f
-      HVM64: ami-f2d3638a
-      HVMG2: ami-ee15a196
+  Create resources VPC and EC2.
 Resources:
   LabVPC:
     Type: AWS::EC2::VPC
@@ -91,3 +52,10 @@ Resources:
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
+  MyEC2:
+    Type: AWS::EC2::Instance
+    InstanceType: t2.micro
+    SubnetId: !Ref PublicSubnet1
+    AvailabilityZone: us-east-2a
+    KeyName: aws-agahie-key
+    
