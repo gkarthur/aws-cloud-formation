@@ -40,10 +40,6 @@ Mappings:
       PV64: ami-7f77b31f
       HVM64: ami-f2d3638a
       HVMG2: ami-ee15a196
-    us-west-1:
-      PV64: ami-a2490dc2
-      HVM64: ami-824c4ee2
-      HVMG2: ami-0da4a46d
 Resources:
   LabVPC:
     Type: AWS::EC2::VPC
