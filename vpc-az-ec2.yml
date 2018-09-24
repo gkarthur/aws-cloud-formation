@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  Create resources VPC with one AZ, private and public subnet and autoscaling.
+  Create resources VPC with two AZ, private and public subnet and autoscaling.
 Parameters:
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
