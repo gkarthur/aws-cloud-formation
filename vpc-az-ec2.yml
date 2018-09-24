@@ -71,7 +71,10 @@ Resources:
     Type: AWS::EC2::NatGateway
     DependsOn: VPCGatewayAttachment
     Properties:
-      AllocationId: !Ref LabEIP
+      AllocationId:
+        Fn::GetAtt:
+        - LabEIP
+        - AllocationId
       SubnetId: !Ref PublicSubnetA
   PrivateSubnetA:
     Type: AWS::EC2::Subnet
