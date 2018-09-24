@@ -34,7 +34,7 @@ Resources:
       EnableDnsHostnames: true
       InstanceTenancy: default
   LabInternetGateway:
-    Type: AWS::EC2::InternetGateway
+    Type: AWS::EC2::InternetGateway  
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -47,7 +47,7 @@ Resources:
       CidrBlock: 10.200.0.0/24
       AvailabilityZone: 'us-east-2a'
       MapPublicIpOnLaunch: true
-  PublicRouteTable:
+  PublicRouteTableA:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref LabVPC
@@ -57,24 +57,49 @@ Resources:
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref LabInternetGateway
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref PublicRouteTableA
   PublicSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PublicRouteTable
+      RouteTableId: !Ref PublicRouteTableA
+      SubnetId: !Ref PublicSubnetA
+  LabEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: 'vpc'
+  LabNatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !Ref LabEIP
       SubnetId: !Ref PublicSubnetA
   PrivateSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref LabVPC
-      CidrBlock: 10.200.0.0/24
+      CidrBlock: 10.200.1.0/24
       AvailabilityZone: 'us-east-2a'
-      MapPublicIpOnLaunch: true
-  InstancesSecurityGroup:
+      MapPublicIpOnLaunch: true  
+  PrivateRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref LabVPC
+  NatRouteA:
+    Type: AWS::EC2::Route
+    DependsOn: LabNatGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref LabNatGateway
+      RouteTableId: !Ref PrivateRouteTableA
+  PrivateSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableA
+      SubnetId: !Ref PrivateSubnetA    
+  SSHSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: 'Internet Group'
-      GroupDescription: "SSH and HTTP traffic in, all traffic out."
+      GroupDescription: "SSH traffic in, all traffic out."
       VpcId: !Ref LabVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -88,15 +113,17 @@ Resources:
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
-  MyEC2:
-    Type: AWS::EC2::Instance
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      ImageId: !FindInMap
-        - RegionMap
-        - !Ref 'AWS::Region'
-        - AMI
-      SecurityGroupIds:
-        - !Ref SSHSecurityGroup     
-      InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyName
-      SubnetId: !Ref PublicSubnetA
+      GroupName: 'Internet Group'
+      GroupDescription: "HTTP traffic in, all traffic out."
+      VpcId: !Ref LabVPC
+      SecurityGroupIngress:
+        - IpProtocol: http
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0  
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
