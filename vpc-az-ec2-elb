@@ -1,0 +1,188 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Create resources VPC with two AZ, private and public subnet and autoscaling.
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    Default: aws-agahie-key
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  InstanceType:
+    Description: WebServer EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-7f418316
+    us-west-1:
+      AMI: ami-951945d0
+    us-east-2:
+      AMI: ami-0b59bfac6be064b78
+    eu-west-1:
+      AMI: ami-24506250
+Resources:
+  LabVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.200.0.0/20
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+  LabInternetGateway:
+    Type: AWS::EC2::InternetGateway  
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+        VpcId: !Ref LabVPC
+        InternetGatewayId: !Ref LabInternetGateway
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref LabVPC
+      CidrBlock: 10.200.0.0/24
+      AvailabilityZone: 'us-east-2a'
+      MapPublicIpOnLaunch: true
+  PublicRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref LabVPC
+  InternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: LabInternetGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref LabInternetGateway
+      RouteTableId: !Ref PublicRouteTableA
+  PublicSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTableA
+      SubnetId: !Ref PublicSubnetA
+  LabEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: 'vpc'
+  LabNatGateway:
+    Type: AWS::EC2::NatGateway
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - LabEIP
+        - AllocationId
+      SubnetId: !Ref PublicSubnetA
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref LabVPC
+      CidrBlock: 10.200.1.0/24
+      AvailabilityZone: 'us-east-2a'
+      MapPublicIpOnLaunch: true  
+  PrivateRouteTableA:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref LabVPC
+  NatRouteA:
+    Type: AWS::EC2::Route
+    DependsOn: LabNatGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref LabNatGateway
+      RouteTableId: !Ref PrivateRouteTableA
+  PrivateSubnetARouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableA
+      SubnetId: !Ref PrivateSubnetA
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref LabVPC
+      CidrBlock: 10.200.3.0/24
+      AvailabilityZone: 'us-east-2b'
+      MapPublicIpOnLaunch: true
+  PublicRouteTableB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref LabVPC
+  InternetRouteB:
+    Type: AWS::EC2::Route
+    DependsOn: LabInternetGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref LabInternetGateway
+      RouteTableId: !Ref PublicRouteTableB
+  PublicSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTableB
+      SubnetId: !Ref PublicSubnetB
+  LabEIPB:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: 'vpc'
+  LabNatGatewayB:
+    Type: AWS::EC2::NatGateway
+    DependsOn: VPCGatewayAttachment
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - LabEIPB
+        - AllocationId
+      SubnetId: !Ref PublicSubnetB
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref LabVPC
+      CidrBlock: 10.200.4.0/24
+      AvailabilityZone: 'us-east-2b'
+      MapPublicIpOnLaunch: true  
+  PrivateRouteTableB:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref LabVPC
+  NatRouteB:
+    Type: AWS::EC2::Route
+    DependsOn: LabNatGateway
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref LabNatGatewayB
+      RouteTableId: !Ref PrivateRouteTableB
+  PrivateSubnetBRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableB
+      SubnetId: !Ref PrivateSubnetB    
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: 'SSH Security Group'
+      GroupDescription: "SSH traffic in, all traffic out."
+      VpcId: !Ref LabVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0 
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  HTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: 'Web Security Group'
+      GroupDescription: "HTTP traffic in, all traffic out."
+      VpcId: !Ref LabVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0  
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
