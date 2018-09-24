@@ -69,6 +69,7 @@ Resources:
       Domain: 'vpc'
   LabNatGateway:
     Type: AWS::EC2::NatGateway
+    DependsOn: VPCGatewayAttachment
     Properties:
       AllocationId: !Ref LabEIP
       SubnetId: !Ref PublicSubnetA
