@@ -88,7 +88,7 @@ Resources:
     DependsOn: LabNatGateway
     Properties:
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref LabNatGateway
+      NatGatewayId: !Ref LabNatGateway
       RouteTableId: !Ref PrivateRouteTableA
   PrivateSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
