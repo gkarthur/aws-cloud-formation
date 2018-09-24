@@ -24,7 +24,7 @@ cd aws-cloud-formation
 To create 1 VPC and 1 Subnet
 
 ```
-aws cloudformation create-stack --template-body file://ec2-vpc.yml --stack-name st001
+aws cloudformation create-stack --template-body file://vpc-create.yml --stack-name st001
 ```
 
 
