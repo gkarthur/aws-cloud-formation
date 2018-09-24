@@ -98,7 +98,7 @@ Resources:
   SSHSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: 'Internet Group'
+      GroupName: 'SSH Security Group'
       GroupDescription: "SSH traffic in, all traffic out."
       VpcId: !Ref LabVPC
       SecurityGroupIngress:
@@ -112,7 +112,7 @@ Resources:
   HTTPSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: 'Internet Group'
+      GroupName: 'Web Security Group'
       GroupDescription: "HTTP traffic in, all traffic out."
       VpcId: !Ref LabVPC
       SecurityGroupIngress:
