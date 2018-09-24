@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  Create resources VPC and EC2.
+  Create resources VPC with one AZ, private and public subnet and autoscaling.
 Parameters:
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
@@ -29,7 +29,7 @@ Resources:
   LabVPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.200.0.0/16
+      CidrBlock: 10.200.0.0/20
       EnableDnsSupport: true
       EnableDnsHostnames: true
       InstanceTenancy: default
@@ -40,11 +40,12 @@ Resources:
     Properties:
         VpcId: !Ref LabVPC
         InternetGatewayId: !Ref LabInternetGateway
-  PublicSubnet1:
+  PublicSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref LabVPC
-      CidrBlock: 10.200.10.0/24
+      CidrBlock: 10.200.0.0/24
+      AvailabilityZone: 'us-east-2a'
       MapPublicIpOnLaunch: true
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -57,22 +58,33 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref LabInternetGateway
       RouteTableId: !Ref PublicRouteTable
-  SubnetARouteTableAssociation:
+  PublicSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubnet1
-  SSHSecurityGroup:
+      SubnetId: !Ref PublicSubnetA
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref LabVPC
+      CidrBlock: 10.200.0.0/24
+      AvailabilityZone: 'us-east-2a'
+      MapPublicIpOnLaunch: true
+  InstancesSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: 'Internet Group'
-      GroupDescription: "SSH traffic in, all traffic out."
+      GroupDescription: "SSH and HTTP traffic in, all traffic out."
       VpcId: !Ref LabVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '22'
           ToPort: '22'
           CidrIp: 0.0.0.0/0
+        - IpProtocol: http
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0  
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
@@ -87,4 +99,4 @@ Resources:
         - !Ref SSHSecurityGroup     
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
-      SubnetId: !Ref PublicSubnet1
+      SubnetId: !Ref PublicSubnetA
