@@ -116,7 +116,7 @@ Resources:
       GroupDescription: "HTTP traffic in, all traffic out."
       VpcId: !Ref LabVPC
       SecurityGroupIngress:
-        - IpProtocol: http
+        - IpProtocol: tcp
           FromPort: '8080'
           ToPort: '8080'
           CidrIp: 0.0.0.0/0  
