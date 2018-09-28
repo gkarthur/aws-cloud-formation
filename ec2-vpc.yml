@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  Create resources VPC and EC2.
+  Create resources VPC and EC2. Install Git and Ansible
 Parameters:
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
@@ -78,6 +78,19 @@ Resources:
           CidrIp: 0.0.0.0/0
   MyEC2:
     Type: AWS::EC2::Instance
+    Metadata:
+      'AWS::CloudFormation::Init':
+        configSets:
+          myec2_install:
+            - install_prepare 
+            - install_ansible
+        install_prepare:
+          packages:
+            yum:
+              git: []
+        install_ansible:
+          commands:
+            installAnsible: "pip install ansible"    
     Properties:
       ImageId: !FindInMap
         - RegionMap
