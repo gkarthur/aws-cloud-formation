@@ -83,14 +83,12 @@ Resources:
         configSets:
           myec2_install:
             - install_prepare 
-            - install_ansible
         install_prepare:
           packages:
             yum:
               git: []
-        install_ansible:
-          commands:
-            installAnsible: "pip install ansible"    
+            python:
+              ansible: []
     Properties:
       ImageId: !FindInMap
         - RegionMap
@@ -126,4 +124,4 @@ Resources:
             - |+
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT15M
+        Timeout: PT30M
