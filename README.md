@@ -18,6 +18,15 @@ cd git
 git clone https://github.com/gkarthur/aws-cloud-formation.git
 cd aws-cloud-formation
 ```
+## Configure AWS Credentials
+
+```
+aws configure
+AWS Access Key ID [None]: xxxxx
+AWS Secret Access Key [None]: yyyyy
+Default region name [None]: us-east-2
+Default output format [None]:
+```
 
 ## Create VPC and Subnet
 
