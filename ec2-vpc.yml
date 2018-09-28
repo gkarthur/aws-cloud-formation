@@ -101,8 +101,8 @@ Resources:
       InstanceType: !Ref InstanceType
       KeyName: !Ref KeyName
       SubnetId: !Ref PublicSubnet1
-        UserData: !Base64 
-          'Fn::Join':
+      UserData: !Base64 
+        'Fn::Join':
           - ''
           - - |
               #!/bin/bash -xe
@@ -124,3 +124,6 @@ Resources:
             - '         --region '
             - !Ref 'AWS::Region'
             - |+
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT15M
