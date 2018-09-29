@@ -83,7 +83,6 @@ Resources:
         configSets:
           myec2_install:
             - prepare_install
-            - install_appli
         prepare_install:
           packages:
             yum:
@@ -91,18 +90,9 @@ Resources:
             python:
               ansible: []
           commands:
-            ansiblelocalmode:
-              command: "mkdir /etc/ansible; echo \"localhost ansible_connection=local\" > /etc/ansible/hosts "
-              test: "test ! -e /etc/ansible/hosts"
             getplaybook:
               command: "git clone https://github.com/gkarthur/ansible.git"
               cwd: "~"
-            playjdk:
-              command: "ansible-playbook ansible/java.yml"
-            playmaven:
-              command: "ansible-playbook ansible/maven.yml"
-        install_appli:
-          commands:
             getsources:
               command: "git clone git clone https://github.com/gkarthur/demo-aws-rds.git"
             build:
