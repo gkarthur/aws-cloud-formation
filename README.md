@@ -36,5 +36,11 @@ To create 1 VPC and 1 Subnet
 aws cloudformation create-stack --template-body file://vpc-create.yml --stack-name st001
 ```
 
+To delete statck
+
+```
+aws cloudformation delete-stack --stack-name st001
+```
+
 
 
