@@ -77,7 +77,7 @@ Resources:
     Properties:
       GroupName: 'Internet Group'
       GroupDescription: "SSH traffic in, all traffic out."
-      VpcId: !Ref LabVPC
+      VpcId: !Ref LabVPCKube
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '22'
