@@ -103,7 +103,31 @@ Resources:
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
-          CidrIp: 0.0.0.0/0
+          CidrIp: 0.0.0.0/0  
+  EC2InstanceA:
+    Type: AWS::EC2::Instance    
+    Properties:
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - AMI
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup     
+      InstanceType: t2.medium
+      KeyName: !Ref KeyName
+      SubnetId: !Ref PublicSubnetA
+  EC2InstanceB:
+    Type: AWS::EC2::Instance    
+    Properties:
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - AMI
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup     
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      SubnetId: !Ref PublicSubnetB
   ElasticLoadBalancer:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
