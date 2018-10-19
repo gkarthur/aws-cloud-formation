@@ -86,7 +86,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTableB
       SubnetId: !Ref PublicSubnetB    
-  SecurityGroup:
+  EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: 'ELB Security Group'
@@ -113,7 +113,7 @@ Resources:
         - AMI
       SecurityGroupIds:
         - !Ref EC2SecurityGroup     
-      InstanceType: t2.medium
+      InstanceType: t2.micro
       KeyName: !Ref KeyName
       SubnetId: !Ref PublicSubnetA
   EC2InstanceB:
