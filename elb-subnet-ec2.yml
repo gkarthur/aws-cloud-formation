@@ -136,8 +136,8 @@ Resources:
       KeyName: !Ref KeyName
       SubnetId: !Ref PublicSubnetA
       Volumes:
-        Device: /dev/xvda
-        VolumeId: !Ref EC2VolumeMagnetic
+        - Device: /dev/xvda
+          VolumeId: !Ref EC2VolumeMagnetic
   EC2InstanceB:
     Type: AWS::EC2::Instance    
     Properties:
@@ -151,8 +151,8 @@ Resources:
       KeyName: !Ref KeyName
       SubnetId: !Ref PublicSubnetB
       Volumes:
-        Device: /dev/xvda
-        VolumeId: !Ref EC2VolumeMagnetic
+        - Device: /dev/xvda
+          VolumeId: !Ref EC2VolumeMagnetic
   ElasticLoadBalancer:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
