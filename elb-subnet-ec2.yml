@@ -146,10 +146,14 @@ Resources:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
       Subnets:
-      - !Ref PublicSubnetA
-      - !Ref PublicSubnetB
-      SecurityGroupIds:
+        - !Ref PublicSubnetA
+        - !Ref PublicSubnetB
+      Instances:
+        - !Ref EC2InstanceA
+        - !Ref EC2InstanceB
+      SecurityGroups:
         - !Ref ELBSecurityGroup
+      CrossZone: true
       Listeners:
       - LoadBalancerPort: '80'
         InstancePort: '8080'
