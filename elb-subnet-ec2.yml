@@ -89,7 +89,7 @@ Resources:
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: 'ELB Security Group'
+      GroupName: 'EC2 Security Group'
       GroupDescription: "SSH traffic in, all traffic out."
       VpcId: !Ref LabVPC
       SecurityGroupIngress:
@@ -103,7 +103,21 @@ Resources:
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
-          CidrIp: 0.0.0.0/0  
+          CidrIp: 0.0.0.0/0
+  ELBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: 'ELB Security Group'
+      GroupDescription: "HTTP for ELB traffic "
+      VpcId: !Ref LabVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
   EC2InstanceA:
     Type: AWS::EC2::Instance    
     Properties:
@@ -134,6 +148,8 @@ Resources:
       Subnets:
       - !Ref PublicSubnetA
       - !Ref PublicSubnetB
+      SecurityGroupIds:
+        - !Ref ELBSecurityGroup
       Listeners:
       - LoadBalancerPort: '80'
         InstancePort: '8080'
